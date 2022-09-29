@@ -16,19 +16,35 @@ function vcpu() {
 }
 
 function mem() {
-        export M=`free | grep Mem: | awk '{print $2}'`
-        export MT=`echo $(( $M / 1024 ))`
-        echo "#Memory Usage: X/${MT}MB (X.XX%)" 
+        export MT=`free | grep Mem: | awk '{print $2}'`
+        export MT=`echo $(( $MT / 1024 ))`
+        export MU=`free | grep Mem: | awk '{print $3}'`
+        export MU=`echo $(( $MU / 1024 ))`
+        export MP=`free | grep Mem | awk '{print $3/$2 * 100}'`
+        echo "#Memory Usage: ${MU}/${MT}MB (${MP:0:3}%)" 
+}
+
+function diskUsage() {
+        export DA=`df | grep root | awk '{print $4}'`
+        export DU=`df | grep root | awk '{print $3}'`
+        export DT=`echo $(( $DA + DU ))`
+        export DT=`echo $(( $DT / 1024 ))`
+        export DT2=`df -h | grep root | awk '{print $2}'`
+        export DU=`echo $(( $DU / 1024 ))`
+        export DP=`echo $DU $DT | awk '{print $1/$2 * 100}'`
+        echo "#Disk Usage: ${DU}/${DT2} (${DP:0:2}%)"
 }
 
 function cpuload() {
-        export CPULoad=$[100-$(vmstat 1 2| tail -1|awk '{print $15}')]
-        echo "#CPU load: ${CPULoad}%"
+        export T=`top -b -n 1 | grep Cpu | awk '{print $7$8}' | cut -d',' -f2 | tr -d 'id'`
+        export T=`bc<<<"100.0 - $T"`
+        echo "#CPU load: ${T}%"
 }
 
-function cpuload2() {
-        export CPULoad=`uptime | awk '{print $8}' | tr ',' '$'`
-        echo "#CPU load: ${CPULoad}%"
+function lastBoot() {
+        export LBD=`last --time-format iso | head -1 | awk '{print $4}' | cut -d'T' -f1`
+        export LBH=`last --time-format iso | head -1 | awk '{print $4}' | cut -d'T' -f2`
+        echo "#Last boot: ${LBD} ${LBH:0:4}"
 }
 
 function lvmOn() {
@@ -68,7 +84,9 @@ arch
 cpu
 vcpu
 mem
-cpuload2
+diskUsage
+cpuload
+lastBoot
 lvmOn
 countActiveConnections
 countLoggedUsers
