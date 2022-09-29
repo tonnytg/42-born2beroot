@@ -31,8 +31,20 @@ function cpuload2() {
         echo "#CPU load: ${CPULoad}%"
 }
 
+function lvmOn() {
+	export X=`echo $X | sed 's/-/--/g'`
+	cat /etc/fstab | grep $X 2>&1 >> /dev/null
+	if [ $? -eq 0 ];then
+		echo "#LVM use: yes"
+	else
+		echo "#LVM use: no"
+	fi
+}
+		
+
 arch
 cpu
 vcpu
 mem
 cpuload2
+lvmOn
