@@ -32,16 +32,37 @@ function cpuload2() {
 }
 
 function lvmOn() {
-	expot X=`vgs | grep -v VG | awk '{print $1}'`
-	export X=`echo $X | sed 's/-/--/g'`
-	cat /etc/fstab | grep $X 2>&1 >> /dev/null
-	if [ $? -eq 0 ];then
-		echo "#LVM use: yes"
-	else
-		echo "#LVM use: no"
-	fi
+        export X=`vgs | grep -v VG | awk '{print $1}'`
+        export X=`echo $X | sed 's/-/--/g'`
+        cat /etc/fstab | grep $X 2>&1 >> /dev/null
+        if [ $? -eq 0 ];then
+                echo "#LVM use: yes"
+        else
+                echo "#LVM use: no"
+        fi
 }
-		
+
+function countActiveConnections() {
+        export CONESTAB=`ss -tn | grep -v State | wc -l`
+        echo "#Connections TCP : ${CONESTAB} ESTABLISHED"
+}
+
+function countLoggedUsers() {
+        export TotalUsers=`w | grep -v USER | grep -v load | awk '{print $1}' | wc -l`
+        echo "#User log: ${TotalUsers}"
+}
+
+function getIP() {
+        export NET="enp0s3"
+        export IP=`ifconfig $NET | grep -v inet6 | egrep 'inet|ether' | awk '{print $2}' | head -1`
+        export MAC=`ifconfig $NET | grep -v inet6 | egrep 'inet|ether' | awk '{print $2}' | tail -1`
+        echo "#Network: IP ${IP} (${MAC})"
+}
+
+function countSudoCommands() {
+        export SudoTotal=`journalctl _COMM=sudo | grep COMMAND | wc -l`
+        echo "#Sudo : ${SudoTotal} cmd"
+}
 
 arch
 cpu
@@ -49,3 +70,7 @@ vcpu
 mem
 cpuload2
 lvmOn
+countActiveConnections
+countLoggedUsers
+getIP
+countSudoCommands
