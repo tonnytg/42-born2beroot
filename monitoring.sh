@@ -48,7 +48,7 @@ function lastBoot() {
 }
 
 function lvmOn() {
-        export X=`vgs | grep -v VG | awk '{print $1}'`
+        export X="antthoma-vg"
         export X=`echo $X | sed 's/-/--/g'`
         cat /etc/fstab | grep $X 2>&1 >> /dev/null
         if [ $? -eq 0 ];then
