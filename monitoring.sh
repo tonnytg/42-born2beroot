@@ -70,8 +70,8 @@ function countLoggedUsers() {
 
 function getIP() {
         export NET="enp0s3"
-        export IP=`ifconfig $NET | grep -v inet6 | egrep 'inet|ether' | awk '{print $2}' | head -1`
-        export MAC=`ifconfig $NET | grep -v inet6 | egrep 'inet|ether' | awk '{print $2}' | tail -1`
+        export IP=`/usr/sbin/ifconfig $NET | grep -v inet6 | egrep 'inet|ether' | awk '{print $2}' | head -1`
+        export MAC=`/usr/sbin/ifconfig $NET | grep -v inet6 | egrep 'inet|ether' | awk '{print $2}' | tail -1`
         echo "#Network: IP ${IP} (${MAC})"
 }
 
